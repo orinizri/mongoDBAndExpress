@@ -2,6 +2,7 @@ const express = require("express")
 const cors = require("cors");
 const {connect} = require("mongoose");
 const ProductModel = require("./models/product");
+const Product = require("../18.1/models/product");
 const app = express();
 const MONGO_URL = "mongodb://localhost:27017/myDB"
 
@@ -31,10 +32,26 @@ const getProductById = async (req, res) => {
     const product = await ProductModel.find({ _id : id});
     res.send(product)
 }
+const getActiveProducts = async (req,res) => {
+    const activePruducts = await ProductModel.find({isActive : true})
+    console.log("active product", activePruducts)
+    res.send(activePruducts)
+}
+const getPrudctsAtPriceRange = async (req,res) => {
+    const { min , max } = req.params
+    console.log(typeof min)
+    const productsInRange = await ProductModel.find({ price : {$lt : 60 ,$gt : 1} } )
+    console.log("in range product", productsInRange)
+    res.send(productsInRange)
+}
+
 
 app.post("/", addProduct);
 app.get("/", getAllProducts);
-app.get("/:id", getProductById);
+app.get("/products/:id", getProductById);
+app.get('/active', getActiveProducts)
+app.get('/price-range/:min/:max', getPrudctsAtPriceRange)
+
 
 const PORT =3000;
 
